@@ -1,4 +1,7 @@
-﻿using Backend.Model;
+﻿using Backend.Logic;
+using Backend.Model;
+using Backend.Services;
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,8 +12,14 @@ namespace Backend.Controllers
     [ApiController]
     public class MessageController : ControllerBase
     {
-        private static List<MessageModel> messages= new List<MessageModel>();
-        private static List<StreamWriter> clients = new List<StreamWriter>();
+        IMessagLogic logic; 
+        IHubContext<SignalRHub> hub;
+        public MessageController(IMessagLogic logic, IHubContext<SignalRHub> hub)
+        {
+            this.logic = logic;
+            this.hub = hub;
+        }
+
         // GET: api/<MessageController>
         //[HttpGet]
         //public IEnumerable<string> Get()
@@ -22,21 +31,16 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task Get()
         {
-            Response.ContentType = "text/event-stream";
-            var client = new StreamWriter(Response.Body);
-            clients.Add(client);
+           
         }
 
         // POST api/<MessageController>
         [HttpPost]
         public void Post([FromBody] MessageModel message)
         {
-            message.Date=DateTime.Now;
-            messages.Add(message);
-            foreach (var client in clients)
-            {
-                Console.WriteLine($"New message from{message.Name} at {message.Date}: {message.Message}");
-            }
+
+            this.logic.Add(message);
+            
         }
 
         // PUT api/<MessageController>/5

@@ -47,7 +47,9 @@ namespace Frontend
         {
             if (!IsInDesignMode)
             {
-                Messages = new RestCollection<MessageModel>("https://localhost:7166", "messages");
+                Messages = new RestCollection<MessageModel>("https://localhost:7166", "messages","hub");
+                Messages.Add(new MessageModel() { Name = "xyz", Message = "Hello" });
+                Messages.Add(new MessageModel() { Name = "abc", Message = "Hello" });
                 CreateMessageCommand = new RelayCommand(() =>
                 {
                     Messages.Add(new MessageModel() { Name = selectedmessage.Name, Message = selectedmessage.Message });
